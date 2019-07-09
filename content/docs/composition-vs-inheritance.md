@@ -115,7 +115,7 @@ function WelcomeDialog() {
 
 Composition works equally well for components defined as classes:
 
-```js{10,27-31}
+```js{10,28-31}
 function Dialog(props) {
   return (
     <FancyBorder color="blue">
@@ -130,38 +130,29 @@ function Dialog(props) {
   );
 }
 
-class SignUpDialog extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSignUp = this.handleSignUp.bind(this);
-    this.state = {login: ''};
+function SignUpDialog(props) {
+  const [login, setLogin] = useState('')
+  
+  function handleChange(e) {
+    setLogin(e.target.value);
   }
 
-  render() {
-    return (
-      <Dialog title="Mars Exploration Program"
-              message="How should we refer to you?">
-        <input value={this.state.login}
-               onChange={this.handleChange} />
-        <button onClick={this.handleSignUp}>
-          Sign Me Up!
-        </button>
-      </Dialog>
-    );
+  function handleSignUp() {
+    alert(`Welcome aboard, ${login}!`);
   }
 
-  handleChange(e) {
-    this.setState({login: e.target.value});
-  }
-
-  handleSignUp() {
-    alert(`Welcome aboard, ${this.state.login}!`);
-  }
+  return (
+    <Dialog title="Mars Exploration Program" message="How should we refer to you?">
+      <input value={login} onChange={handleChange} />
+      <button onClick={handleSignUp}>
+        Sign Me Up!
+      </button>
+    </Dialog>
+  );
 }
 ```
 
-[**Try it on CodePen**](https://codepen.io/gaearon/pen/gwZbYa?editors=0010)
+[**Try it on CodePen**](https://codepen.io/maxencebouret/pen/OerPRL?editors=0010)
 
 ## So What About Inheritance? {#so-what-about-inheritance}
 

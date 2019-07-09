@@ -74,40 +74,32 @@ In the example below, we will create a [stateful component](/docs/state-and-life
 
 It will render either `<LoginButton />` or `<LogoutButton />` depending on its current state. It will also render a `<Greeting />` from the previous example:
 
-```javascript{20-25,29,30}
-class LoginControl extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleLoginClick = this.handleLoginClick.bind(this);
-    this.handleLogoutClick = this.handleLogoutClick.bind(this);
-    this.state = {isLoggedIn: false};
+```javascript
+function LoginControl(props) {
+  const [isLoggedIn,setIsLoggedIn] = useState(false)
+
+  function handleLoginClick() {
+    setIsLoggedIn(true);
   }
 
-  handleLoginClick() {
-    this.setState({isLoggedIn: true});
+  function handleLogoutClick() {
+    setIsLoggedIn(false);
   }
 
-  handleLogoutClick() {
-    this.setState({isLoggedIn: false});
+  let button;
+
+  if (isLoggedIn) {
+    button = <LogoutButton onClick={handleLogoutClick} />;
+  } else {
+    button = <LoginButton onClick={handleLoginClick} />;
   }
 
-  render() {
-    const isLoggedIn = this.state.isLoggedIn;
-    let button;
-
-    if (isLoggedIn) {
-      button = <LogoutButton onClick={this.handleLogoutClick} />;
-    } else {
-      button = <LoginButton onClick={this.handleLoginClick} />;
-    }
-
-    return (
-      <div>
-        <Greeting isLoggedIn={isLoggedIn} />
-        {button}
-      </div>
-    );
-  }
+  return (
+    <div>
+      <Greeting isLoggedIn={isLoggedIn} />
+      {button}
+    </div>
+  );
 }
 
 ReactDOM.render(
@@ -116,7 +108,7 @@ ReactDOM.render(
 );
 ```
 
-[**Try it on CodePen**](https://codepen.io/gaearon/pen/QKzAgB?editors=0010)
+[**Try it on CodePen**](https://codepen.io/maxencebouret/pen/ydQeVo?editors=0010)
 
 While declaring a variable and using an `if` statement is a fine way to conditionally render a component, sometimes you might want to use a shorter syntax. There are a few ways to inline conditions in JSX, explained below.
 
@@ -158,32 +150,26 @@ Another method for conditionally rendering elements inline is to use the JavaScr
 
 In the example below, we use it to conditionally render a small block of text.
 
-```javascript{5}
-render() {
-  const isLoggedIn = this.state.isLoggedIn;
-  return (
-    <div>
-      The user is <b>{isLoggedIn ? 'currently' : 'not'}</b> logged in.
-    </div>
-  );
-}
+```javascript{3}
+return (
+  <div>
+    The user is <b>{isLoggedIn ? 'currently' : 'not'}</b> logged in.
+  </div>
+);
 ```
 
 It can also be used for larger expressions although it is less obvious what's going on:
 
-```js{5,7,9}
-render() {
-  const isLoggedIn = this.state.isLoggedIn;
-  return (
-    <div>
-      {isLoggedIn ? (
-        <LogoutButton onClick={this.handleLogoutClick} />
-      ) : (
-        <LoginButton onClick={this.handleLoginClick} />
-      )}
-    </div>
-  );
-}
+```js{3,5,7}
+return (
+  <div>
+    {isLoggedIn ? (
+      <LogoutButton onClick={handleLogoutClick} />
+    ) : (
+      <LoginButton onClick={handleLoginClick} />
+    )}
+  </div>
+);
 ```
 
 Just like in JavaScript, it is up to you to choose an appropriate style based on what you and your team consider more readable. Also remember that whenever conditions become too complex, it might be a good time to [extract a component](/docs/components-and-props.html#extracting-components).
@@ -194,7 +180,7 @@ In rare cases you might want a component to hide itself even though it was rende
 
 In the example below, the `<WarningBanner />` is rendered depending on the value of the prop called `warn`. If the value of the prop is `false`, then the component does not render:
 
-```javascript{2-4,29}
+```javascript{2-4,22}
 function WarningBanner(props) {
   if (!props.warn) {
     return null;
@@ -207,29 +193,21 @@ function WarningBanner(props) {
   );
 }
 
-class Page extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {showWarning: true};
-    this.handleToggleClick = this.handleToggleClick.bind(this);
-  }
+function Page (props) {
+  const [showWarning, setShowWarning] = useState(true)
 
-  handleToggleClick() {
-    this.setState(state => ({
-      showWarning: !state.showWarning
-    }));
+  function handleToggleClick() {
+    setShowWarning(!showWarning);
   }
-
-  render() {
-    return (
-      <div>
-        <WarningBanner warn={this.state.showWarning} />
-        <button onClick={this.handleToggleClick}>
-          {this.state.showWarning ? 'Hide' : 'Show'}
-        </button>
-      </div>
-    );
-  }
+  
+  return (
+    <div>
+      <WarningBanner warn={showWarning} />
+      <button onClick={handleToggleClick}>
+        {showWarning ? 'Hide' : 'Show'}
+      </button>
+    </div>
+  );
 }
 
 ReactDOM.render(
@@ -238,6 +216,6 @@ ReactDOM.render(
 );
 ```
 
-[**Try it on CodePen**](https://codepen.io/gaearon/pen/Xjoqwm?editors=0010)
+[**Try it on CodePen**](https://codepen.io/maxencebouret/pen/mZQVXJ?editors=0010)
 
-Returning `null` from a component's `render` method does not affect the firing of the component's lifecycle methods. For instance `componentDidUpdate` will still be called.
+Returning `null` from a component's `render` method does not affect the firing of the component's lifecycle methods.
