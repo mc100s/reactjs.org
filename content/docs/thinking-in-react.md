@@ -16,18 +16,18 @@ One of the many great parts of React is how it makes you think about apps as you
 
 Imagine that we already have a JSON API and a mock from our designer. The mock looks like this:
 
-![Mockup](../images/blog/thinking-in-react-mock.png)
+![Mockup](../images/thinking-in-react/thinking-in-react-mock.png)
 
 Our JSON API returns some data that looks like this:
 
 ```
 [
-  {category: "Sporting Goods", price: "$49.99", stocked: true, name: "Football"},
-  {category: "Sporting Goods", price: "$9.99", stocked: true, name: "Baseball"},
-  {category: "Sporting Goods", price: "$29.99", stocked: false, name: "Basketball"},
-  {category: "Electronics", price: "$99.99", stocked: true, name: "iPod Touch"},
-  {category: "Electronics", price: "$399.99", stocked: false, name: "iPhone 5"},
-  {category: "Electronics", price: "$199.99", stocked: true, name: "Nexus 7"}
+  {price: "$49.99", stocked: true, name: "Football"},
+  {price: "$9.99", stocked: true, name: "Baseball"},
+  {price: "$29.99", stocked: false, name: "Basketball"},
+  {price: "$99.99", stocked: true, name: "iPod Touch"},
+  {price: "$399.99", stocked: false, name: "iPhone 5"},
+  {price: "$199.99", stocked: true, name: "Nexus 7"}
 ];
 ```
 
@@ -39,14 +39,13 @@ But how do you know what should be its own component? Use the same techniques fo
 
 Since you're often displaying a JSON data model to a user, you'll find that if your model was built correctly, your UI (and therefore your component structure) will map nicely. That's because UI and data models tend to adhere to the same *information architecture*. Separate your UI into components, where each component matches one piece of your data model.
 
-![Component diagram](../images/blog/thinking-in-react-components.png)
+![Component diagram](../images/thinking-in-react/thinking-in-react-components.png)
 
 You'll see here that we have five components in our app. We've italicized the data each component represents.
 
   1. **`FilterableProductTable` (orange):** contains the entirety of the example
   2. **`SearchBar` (blue):** receives all *user input*
   3. **`ProductTable` (green):** displays and filters the *data collection* based on *user input*
-  4. **`ProductCategoryRow` (turquoise):** displays a heading for each *category*
   5. **`ProductRow` (red):** displays a row for each *product*
 
 If you look at `ProductTable`, you'll see that the table header (containing the "Name" and "Price" labels) isn't its own component. This is a matter of preference, and there's an argument to be made either way. For this example, we left it as part of `ProductTable` because it is part of rendering the *data collection* which is `ProductTable`'s responsibility. However, if this header grows to be complex (i.e. if we were to add affordances for sorting), it would certainly make sense to make this its own `ProductTableHeader` component.
@@ -56,12 +55,11 @@ Now that we've identified the components in our mock, let's arrange them into a 
   * `FilterableProductTable`
     * `SearchBar`
     * `ProductTable`
-      * `ProductCategoryRow`
       * `ProductRow`
 
 ## Step 2: Build A Static Version in React {#step-2-build-a-static-version-in-react}
 
-<p data-height="600" data-theme-id="0" data-slug-hash="BwWzwm" data-default-tab="js" data-user="lacker" data-embed-version="2" class="codepen">See the Pen <a href="https://codepen.io/gaearon/pen/BwWzwm">Thinking In React: Step 2</a> on <a href="https://codepen.io">CodePen</a>.</p>
+<p data-height="600" data-theme-id="0" data-slug-hash="mZayYJ" data-default-tab="js" data-user="lacker" data-embed-version="2" class="codepen">See the Pen <a href="https://codepen.io/maxencebouret/pen/mZayYJ">Thinking In React: Step 2</a> on <a href="https://codepen.io">CodePen</a>.</p>
 <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script>
 
 Now that you have your component hierarchy, it's time to implement your app. The easiest way is to build a version that takes your data model and renders the UI but has no interactivity. It's best to decouple these processes because building a static version requires a lot of typing and no thinking, and adding interactivity requires a lot of thinking and not a lot of typing. We'll see why.
@@ -106,7 +104,7 @@ So finally, our state is:
 
 ## Step 4: Identify Where Your State Should Live {#step-4-identify-where-your-state-should-live}
 
-<p data-height="600" data-theme-id="0" data-slug-hash="qPrNQZ" data-default-tab="js" data-user="lacker" data-embed-version="2" class="codepen">See the Pen <a href="https://codepen.io/gaearon/pen/qPrNQZ">Thinking In React: Step 4</a> on <a href="https://codepen.io">CodePen</a>.</p>
+<p data-height="600" data-theme-id="0" data-slug-hash="zVyGYM" data-default-tab="js" data-user="lacker" data-embed-version="2" class="codepen">See the Pen <a href="https://codepen.io/maxencebouret/pen/zVyGYM">Thinking In React: Step 4</a> on <a href="https://codepen.io">CodePen</a>.</p>
 
 OK, so we've identified what the minimal set of app state is. Next, we need to identify which component mutates, or *owns*, this state.
 
@@ -125,13 +123,13 @@ Let's run through this strategy for our application:
   * The common owner component is `FilterableProductTable`.
   * It conceptually makes sense for the filter text and checked value to live in `FilterableProductTable`
 
-Cool, so we've decided that our state lives in `FilterableProductTable`. First, add an instance property `this.state = {filterText: '', inStockOnly: false}` to `FilterableProductTable`'s `constructor` to reflect the initial state of your application. Then, pass `filterText` and `inStockOnly` to `ProductTable` and `SearchBar` as a prop. Finally, use these props to filter the rows in `ProductTable` and set the values of the form fields in `SearchBar`.
+Cool, so we've decided that our state lives in `FilterableProductTable`. First, add an instance property `const [state, setState] = useState({filterText:'',inStockOnly:false })` to `FilterableProductTable` to reflect the initial state of your application. Then, pass `filterText` and `inStockOnly` to `ProductTable` and `SearchBar` as a prop. Finally, use these props to filter the rows in `ProductTable` and set the values of the form fields in `SearchBar`.
 
 You can start seeing how your application will behave: set `filterText` to `"ball"` and refresh your app. You'll see that the data table is updated correctly.
 
 ## Step 5: Add Inverse Data Flow {#step-5-add-inverse-data-flow}
 
-<p data-height="600" data-theme-id="0" data-slug-hash="LzWZvb" data-default-tab="js,result" data-user="rohan10" data-embed-version="2" data-pen-title="Thinking In React: Step 5" class="codepen">See the Pen <a href="https://codepen.io/gaearon/pen/LzWZvb">Thinking In React: Step 5</a> on <a href="https://codepen.io">CodePen</a>.</p>
+<p data-height="600" data-theme-id="0" data-slug-hash="MMZwBL" data-default-tab="js,result" data-user="rohan10" data-embed-version="2" data-pen-title="Thinking In React: Step 5" class="codepen">See the Pen <a href="https://codepen.io/maxencebouret/pen/MMZwBL">Thinking In React: Step 5</a> on <a href="https://codepen.io">CodePen</a>.</p>
 
 So far, we've built an app that renders correctly as a function of props and state flowing down the hierarchy. Now it's time to support data flowing the other way: the form components deep in the hierarchy need to update the state in `FilterableProductTable`.
 
